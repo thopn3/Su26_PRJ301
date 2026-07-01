@@ -11,7 +11,7 @@
         <h1>Edit Product</h1>
         <form method="post" action="${pageContext.request.contextPath}/products/edit">
             Product Id 
-            <input type="text" name="txtPId" value="${product.id}" disabled="true"/> <br/>
+            <input type="text" name="txtPId" value="${product.id}" readonly="true"/> <br/>
             
             Product name 
             <input type="text" name="txtPName" value="${product.name}"/> <br/>
@@ -32,7 +32,7 @@
                     </option>
                 </c:forEach>
             </select><br/>
-            <input type="submit" value="Add"/>
+            <input type="submit" value="Update"/>
         </form>
     </body>
 </html>

@@ -87,4 +87,25 @@ public class ProductDAO extends DBContext{
         }
         return product;
     }
+    
+    public int editProduct(Product existProdut){
+        try {
+            // Giả định email chưa được đăng kí (Đã kiểm tra sự tồn tại của User theo email)
+            String sql = "UPDATE Products SET Name=?,Price=?,UnitsInStock=?,CategoryId=? WHERE Id=?";
+            // Khởi tạo đối tượng PrepareStatement để thực thi truy vấn
+            PreparedStatement ps = connection.prepareStatement(sql);
+            // Làm sạch dữ liệu cho câu truy vấn
+            ps.setString(1, existProdut.getName());
+            ps.setInt(2, existProdut.getPrice());
+            ps.setInt(3, existProdut.getUnitsInStock());
+            ps.setInt(4, existProdut.getCategoryId());
+            ps.setInt(5,existProdut.getId());
+            
+            int result = ps.executeUpdate();
+            return result;
+        } catch (SQLException ex) {
+            Logger.getLogger(ProductDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return 0;
+    }
 }

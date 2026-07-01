@@ -1,4 +1,3 @@
-
 package Controllers;
 
 import DAO.CategoryDAO;
@@ -21,7 +20,7 @@ import java.util.List;
  *
  * @author admin
  */
-@WebServlet(name="ProductServlet", urlPatterns={"/products/*"})
+@WebServlet(name = "ProductServlet", urlPatterns = {"/products/*"})
 public class ProductServlet extends HttpServlet {
 
     @Override
@@ -32,21 +31,21 @@ public class ProductServlet extends HttpServlet {
         if (path == null || path.equals("/")) {
             path = "/list";
         }
-        
+
         switch (path) {
             case "/add":
                 // Kiểm tra session của user (role='admin')
                 HttpSession session = req.getSession();
                 User user = (User) session.getAttribute("admin_info");
-                if(user!=null && user.getRole().trim().equals("admin")){
+                if (user != null && user.getRole().trim().equals("admin")) {
                     // Lấy dữ liệu của Categoies
                     List<Category> categories = new CategoryDAO().getCategories();
                     // Truyền dữ liệu qua attribute của request
                     req.setAttribute("categories", categories);
                     req.getRequestDispatcher("/AddProduct.jsp").forward(req, resp);
-                }else{
+                } else {
                     session.setAttribute("msgError", "Not Authorized. Login please!");
-                    resp.sendRedirect(req.getContextPath()+"/users/login");
+                    resp.sendRedirect(req.getContextPath() + "/users/login");
                 }
                 break;
             case "/edit":
@@ -54,28 +53,29 @@ public class ProductServlet extends HttpServlet {
                 int id = Integer.parseInt(req.getParameter("id"));
                 // Lấy dữ liệu của product từ DB theo id
                 Product product = new ProductDAO().getProductById(id);
-                if(product!=null){
+                if (product != null) {
                     // Lấy dữ liệu của Categoies
                     List<Category> categories = new CategoryDAO().getCategories();
                     // Truyền dữ liệu qua attribute của request
                     req.setAttribute("categories", categories);
                     req.setAttribute("product", product);
                     req.getRequestDispatcher("/EditProduct.jsp").forward(req, resp);
-                }else{
+                } else {
                     // Tự viết điều hướng về trang NotFound.jsp
                 }
-                
+
                 break;
             case "/delete":
-                
+
                 break;
             case "/list":
                 List<ProductDTO> products = new ProductDAO().getProducts();
-                if(products!=null)
+                if (products != null) {
                     req.setAttribute("products", products);
-                else
+                } else {
                     req.setAttribute("errorMessage", "No data");
-                
+                }
+
                 req.getRequestDispatcher("/ProductList.jsp").forward(req, resp);
                 break;
             default:
@@ -92,13 +92,13 @@ public class ProductServlet extends HttpServlet {
         if (path == null || path.equals("/")) {
             path = "/list";
         }
-        
+
         switch (path) {
             case "/add":
                 // Kiểm tra session của user (role='admin')
                 HttpSession session = req.getSession();
                 User user = (User) session.getAttribute("admin_info");
-                if(user!=null && user.getRole().trim().equals("admin")){
+                if (user != null && user.getRole().trim().equals("admin")) {
                     // Lấy dữ liệu trên Form
                     String name = req.getParameter("txtPName");
                     int price = Integer.parseInt(req.getParameter("txtPrice"));
@@ -106,20 +106,38 @@ public class ProductServlet extends HttpServlet {
                     int catId = Integer.parseInt(req.getParameter("ddlCategory"));
                     Product newProduct = new Product(name, price, stock, catId);
                     int insertedRow = new ProductDAO().createNewProduct(newProduct);
-                    if(insertedRow>0){
+                    if (insertedRow > 0) {
                         session.setAttribute("msgSuccess", "Create success!");
                         resp.sendRedirect(req.getContextPath() + "/products/list");
-                    }else{
+                    } else {
                         req.setAttribute("error", "Create False!");
-                        req.getRequestDispatcher("/AddProduct.jsp").forward(req, resp);
+                        req.getRequestDispatcher("/EditProduct.jsp").forward(req, resp);
                     }
-                }else{
+                } else {
                     session.setAttribute("msgError", "Not Authorized. Login please!");
-                    resp.sendRedirect(req.getContextPath()+"/users/login");
+                    resp.sendRedirect(req.getContextPath() + "/users/login");
                 }
                 break;
             case "/edit":
+                HttpSession session1 = req.getSession();
                 
+                int id = Integer.parseInt(req.getParameter("txtPId"));
+                String name = req.getParameter("txtPName");
+                int price = Integer.parseInt(req.getParameter("txtPrice"));
+                int stock = Integer.parseInt(req.getParameter("txtInStock"));
+                int catId = Integer.parseInt(req.getParameter("ddlCategory"));
+                
+                Product existProduct = new Product(id, name, price, stock, catId);
+                System.out.println(existProduct);
+                
+                int updatedRow = new ProductDAO().editProduct(existProduct);
+                if (updatedRow > 0) {
+                    session1.setAttribute("msgSuccess", "Update success!");
+                    resp.sendRedirect(req.getContextPath() + "/products/list");
+                } else {
+                    req.setAttribute("error", "Create False!");
+                    req.getRequestDispatcher("/EditProduct.jsp").forward(req, resp);
+                }
                 break;
             default:
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);

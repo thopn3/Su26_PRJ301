@@ -52,6 +52,14 @@ public class UserServlet extends HttpServlet {
                     resp.sendRedirect(req.getContextPath() + "/users/login");
                 }
                 break;
+            case "/logout":
+                HttpSession session2 = req.getSession();
+                if(session2.getAttribute("admin_info")!=null){
+                    session2.removeAttribute("admin_info");
+                    resp.sendRedirect(req.getContextPath() + "/");
+                }
+                
+                break;
             default:
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
                 break;
